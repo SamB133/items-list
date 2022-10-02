@@ -5,23 +5,21 @@ import produce from 'immer';
 
 const App: FC = () => {
     const [listItems, setListItems] = useState<ListItemType[]>([]);
-    const [ordered, setOrdered] = useState(false);
+    const [numbered, setNumbered] = useState(false);
     const itemRef = useRef<HTMLInputElement>(null);
     const addButtonRef = useRef<HTMLButtonElement>(null);
     const localStorageItemsKey = 'listApp.listItems';
     const localStorageOrderedKey = 'listApp.listOrdered';
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/items')
-            .then((response) => response.json())
-            .then((data) => setListItems(data));
+        fetchList();
         if (localStorage.getItem(localStorageOrderedKey) == null) {
             return;
         } else {
             const storedListOrdered: boolean = JSON.parse(
                 localStorage.getItem(localStorageOrderedKey) as string,
             );
-            if (storedListOrdered) setOrdered(storedListOrdered);
+            if (storedListOrdered) setNumbered(storedListOrdered);
         }
     }, []);
 
@@ -30,15 +28,15 @@ const App: FC = () => {
     }, [listItems]);
 
     useEffect(() => {
-        localStorage.setItem(localStorageOrderedKey, JSON.stringify(ordered));
-    }, [ordered]);
+        localStorage.setItem(localStorageOrderedKey, JSON.stringify(numbered));
+    }, [numbered]);
 
     function addItem() {
         if (itemRef.current) {
             if (itemRef.current.value.length <= 75) {
                 const description = itemRef.current.value;
                 if (description === '') return;
-                fetch('http://localhost:3000/api/items', {
+                fetch(`http://localhost:3000/api/items`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -47,7 +45,15 @@ const App: FC = () => {
                 })
                     .then((response) => response.json())
                     .then((newItem) => {
-                        setListItems([...listItems, newItem]);
+                        setListItems(
+                            produce(listItems, (newListItems) => {
+                                newListItems.push({
+                                    id: Math.random(),
+                                    description,
+                                    complete: false,
+                                });
+                            }),
+                        );
                     })
                     .catch((error) => {
                         console.error('Error: ', error);
@@ -58,18 +64,64 @@ const App: FC = () => {
                 itemRef.current.value = '';
             }
         }
+        fetchList();
     }
 
     function complete(index: number) {
-        setListItems(
-            produce(listItems, (newListItems) => {
-                newListItems[index].complete = !newListItems[index].complete;
-            }),
-        );
+        let newItem = produce(listItems[index], (newItem) => {
+            newItem.complete = !newItem.complete;
+        });
+        fetch(`http://localhost:3000/api/items/${newItem.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newItem),
+        })
+            .then((response) => response.json())
+            .then(() => {
+                setListItems(
+                    produce(listItems, (newListItems) => {
+                        newListItems[index].complete =
+                            !newListItems[index].complete;
+                    }),
+                );
+            })
+            .catch((error) => {
+                console.error('Error: ', error);
+            });
+        fetchList();
     }
 
     function deleteItem(id: number) {
-        setListItems(listItems.filter((item) => item.id !== id));
+        fetch(`http://localhost:3000/api/items/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then(() => {
+                setListItems(listItems.filter((item) => item.id !== id));
+            })
+            .catch((error) => {
+                console.error('Error: ', error);
+            });
+        fetchList();
+    }
+
+    function deleteCompleted() {
+        listItems.forEach((item) => {
+            if (item.complete) {
+                deleteItem(item.id);
+            }
+        });
+    }
+
+    function fetchList() {
+        fetch('http://localhost:3000/api/items')
+            .then((response) => response.json())
+            .then((data) => setListItems(data));
     }
 
     return (
@@ -77,9 +129,9 @@ const App: FC = () => {
             <div>
                 <button
                     className="buttonsInput"
-                    onClick={() => setOrdered(!ordered)}
+                    onClick={() => setNumbered(!numbered)}
                 >
-                    Change List Type (Ordered or Unordered)
+                    Change List Type (Bullets or Numbers)
                 </button>
             </div>
             <div>
@@ -103,16 +155,14 @@ const App: FC = () => {
             <button
                 className="buttonsInput"
                 style={{ color: 'red' }}
-                onClick={() =>
-                    setListItems(listItems.filter((item) => !item.complete))
-                }
+                onClick={deleteCompleted}
             >
                 Delete Completed Items
             </button>
             <div className="text">
                 You have {listItems.length} items in your list
             </div>
-            <List ordered={ordered}>
+            <List numbered={numbered}>
                 {listItems.map((item, index) => (
                     <ListItem
                         key={item.id}

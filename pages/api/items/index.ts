@@ -13,7 +13,6 @@ export default function handler(
     } else if (req.method === 'POST') {
         const stmt = db.prepare(`INSERT INTO items ("description", "complete")
         VALUES (@description, 0);`);
-        console.log(req.body);
         const id = stmt.run(req.body).lastInsertRowid;
         res.status(200).json({
             id,

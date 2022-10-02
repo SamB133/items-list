@@ -1,18 +1,14 @@
-import { FC } from 'react'
+import { FC } from 'react';
 
-const List: FC<{ ordered: boolean, children: any }> = ({ ordered, children }) => {
-	return (
-		<div className='centered'>
-			{ordered ?
-				<ol>
-					{children}
-				</ol>
-				:
-				<ul>
-					{children}
-				</ul>}
-		</div>
-	);
+const List: FC<{ numbered: boolean; children: any }> = ({
+    numbered,
+    children,
+}) => {
+    return (
+        <div className="centered">
+            {numbered ? <ol>{children}</ol> : <ul>{children}</ul>}
+        </div>
+    );
 };
 
 export default List;

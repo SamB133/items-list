@@ -22,7 +22,6 @@ export default function handler(
         "complete" = @complete
         WHERE "id" = @id;`);
         let temp = { ...req.body, id, complete: req.body.complete ? 1 : 0 };
-        console.log(temp);
         let changes = stmt.run(temp).changes;
         if (changes === 0) {
             res.status(404).json({});
