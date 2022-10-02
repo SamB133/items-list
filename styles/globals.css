@@ -24,3 +24,72 @@ a {
     background: black;
   }
 }
+
+button:hover {
+	cursor: pointer;
+}
+
+span.itemCompleted {
+	text-decoration: line-through;
+	text-decoration-color: red;
+	text-decoration-thickness: 0.1rem;
+}
+
+span:hover {
+	cursor: pointer;
+}
+
+span {
+	width: fit-content;
+	max-width: 90%;
+	word-wrap: break-word;
+	display: inline-block;
+	vertical-align: middle;
+	padding: 0.3rem;
+	font-family: initial;
+}
+
+span.spanWithDelete {
+	max-width: 69%;
+}
+
+li {
+	border-bottom: solid;
+	border-width: thin;
+	text-align: left;
+	width: 82%;
+	white-space: normal;
+	margin-right: 0;
+	font-family: initial;
+}
+
+ol,
+ul {
+	list-style-position: inside;
+	display: inline-block;
+	width: 90%;
+	font-size: 16px;
+}
+
+.centered {
+	text-align: center;
+}
+
+button.singleDelete {
+	background-color: red;
+	color: white;
+	border: none;
+	width: auto;
+	float: right;
+	position: relative;
+	margin: 0;
+	padding: 2%;
+}
+
+.buttonsInput {
+	font-size: 16px;
+}
+
+.text {
+	font-size: 20px;
+}

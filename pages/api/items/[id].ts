@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Database from 'better-sqlite3';
-import { fromRow, Item } from '../../../lib/item';
+import { fromRow, Item } from '../../../src/item';
 const db = new Database('items-list.db', {});
 
 export default function handler(
