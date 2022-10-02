@@ -19,7 +19,7 @@ const ListItem: FC<ItemListProps> = ({ item, onClickItem, onDeleteItem }) => {
         if (state.dragging && state.axis === 'x') {
             if (state.direction[0] === -1) {
                 setViewDeleteButton(true);
-                setTimeout(setViewDeleteButton, 8000);
+                setTimeout(setViewDeleteButton, 10000);
             } else if (state.direction[0] === 1) {
                 setViewDeleteButton(false);
             }
