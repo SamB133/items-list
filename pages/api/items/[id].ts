@@ -1,33 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Database from 'better-sqlite3';
 import { fromRow } from '../../../src/item';
-import Cors from 'cors';
 const db = new Database('items-list.db', {});
-
-const cors = Cors({
-    methods: ['POST', 'GET', 'HEAD', 'DELETE', 'PUT'],
-});
-
-function runMiddleware(
-    req: NextApiRequest,
-    res: NextApiResponse,
-    fn: Function,
-) {
-    return new Promise((resolve, reject) => {
-        fn(req, res, (result: any) => {
-            if (result instanceof Error) {
-                return reject(result);
-            }
-            return resolve(result);
-        });
-    });
-}
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>,
 ) {
-    await runMiddleware(req, res, cors);
     const { id } = req.query;
     if (req.method === 'GET') {
         const stmt = db.prepare('SELECT * FROM items WHERE "id" = ?;');

@@ -36,7 +36,7 @@ const App: FC = () => {
             if (itemRef.current.value.length <= 75) {
                 const description = itemRef.current.value;
                 if (description === '') return;
-                fetch(`http://localhost:3000/api/items`, {
+                fetch(`/api/items`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const App: FC = () => {
         let newItem = produce(listItems[index], (newItem) => {
             newItem.complete = !newItem.complete;
         });
-        fetch(`http://localhost:3000/api/items/${newItem.id}`, {
+        fetch(`/api/items/${newItem.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const App: FC = () => {
     }
 
     function deleteItem(id: number) {
-        fetch(`http://localhost:3000/api/items/${id}`, {
+        fetch(`/api/items/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const App: FC = () => {
     }
 
     function fetchList() {
-        fetch('http://localhost:3000/api/items')
+        fetch('/api/items')
             .then((response) => response.json())
             .then((data) => setListItems(data));
     }
