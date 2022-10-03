@@ -12,7 +12,9 @@ const App: FC = () => {
     const localStorageOrderedKey = 'listApp.listOrdered';
 
     useEffect(() => {
-        fetchList();
+        fetch('/api/items')
+            .then((response) => response.json())
+            .then((data) => setListItems(data));
         if (localStorage.getItem(localStorageOrderedKey) == null) {
             return;
         } else {
@@ -47,11 +49,7 @@ const App: FC = () => {
                     .then((newItem) => {
                         setListItems(
                             produce(listItems, (newListItems) => {
-                                newListItems.push({
-                                    id: Math.random(),
-                                    description,
-                                    complete: false,
-                                });
+                                newListItems.push(newItem);
                             }),
                         );
                     })
@@ -64,7 +62,6 @@ const App: FC = () => {
                 itemRef.current.value = '';
             }
         }
-        fetchList();
     }
 
     function complete(index: number) {
@@ -90,7 +87,6 @@ const App: FC = () => {
             .catch((error) => {
                 console.error('Error: ', error);
             });
-        fetchList();
     }
 
     function deleteItem(id: number) {
@@ -107,7 +103,6 @@ const App: FC = () => {
             .catch((error) => {
                 console.error('Error: ', error);
             });
-        fetchList();
     }
 
     function deleteCompleted() {
@@ -125,12 +120,6 @@ const App: FC = () => {
                     });
             }
         });
-    }
-
-    function fetchList() {
-        fetch('/api/items')
-            .then((response) => response.json())
-            .then((data) => setListItems(data));
         setListItems(listItems.filter((item) => !item.complete));
     }
 
