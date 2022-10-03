@@ -113,7 +113,16 @@ const App: FC = () => {
     function deleteCompleted() {
         listItems.forEach((item) => {
             if (item.complete) {
-                deleteItem(item.id);
+                fetch(`/api/items/${item.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                    .then((response) => response.json())
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    });
             }
         });
     }
@@ -122,6 +131,7 @@ const App: FC = () => {
         fetch('/api/items')
             .then((response) => response.json())
             .then((data) => setListItems(data));
+        setListItems(listItems.filter((item) => !item.complete));
     }
 
     return (
