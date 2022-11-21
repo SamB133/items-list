@@ -1,29 +1,34 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Database from 'better-sqlite3';
 import { fromRow } from '../../../src/item';
-const db = new Database('items-list.db', {});
+import { Pool } from 'pg';
+const pool = new Pool();
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>,
 ) {
+    await pool.connect();
     const { id } = req.query;
     if (req.method === 'GET') {
-        const stmt = db.prepare('SELECT * FROM items WHERE "id" = ?;');
-        let row = stmt.get(id);
-        if (!row) {
+        const result = await pool.query(
+            'SELECT * FROM items WHERE "id" = $1;',
+            [id],
+        );
+        if (result.rowCount < 1) {
             res.status(404).json({});
         } else {
-            res.status(200).json(fromRow(row));
+            res.status(200).json(fromRow(result.rows[0]));
         }
     } else if (req.method === 'PUT') {
-        const stmt = db.prepare(`UPDATE items
-        SET "description" = @description,
-        "complete" = @complete
-        WHERE "id" = @id;`);
         let temp = { ...req.body, id, complete: req.body.complete ? 1 : 0 };
-        let changes = stmt.run(temp).changes;
-        if (changes === 0) {
+        let result = await pool.query(
+            `UPDATE items
+        SET "description" = $1,
+        "complete" = $2
+        WHERE "id" = $3;`,
+            [temp.description, temp.complete, temp.id],
+        );
+        if (result.rowCount === 0) {
             res.status(404).json({});
         } else {
             res.status(200).json({
@@ -33,8 +38,9 @@ export default async function handler(
             });
         }
     } else if (req.method === 'DELETE') {
-        const stmt = db.prepare(`DELETE FROM items WHERE "id" = ?;`);
-        stmt.run(id);
+        const result = await pool.query(`DELETE FROM items WHERE "id" = $1;`, [
+            id,
+        ]);
         res.status(200).json({});
     } else {
         res.status(404).json({});

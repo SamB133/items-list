@@ -1,19 +1,22 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Database from 'better-sqlite3';
 import { fromRow } from '../../../src/item';
-const db = new Database('items-list.db', {});
+import { Pool } from 'pg';
+const pool = new Pool();
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>,
 ) {
     if (req.method === 'GET') {
-        const stmt = db.prepare('SELECT * FROM items');
-        res.status(200).json(stmt.all().map(fromRow));
+        const result = await pool.query('SELECT * FROM items');
+        res.status(200).json(result.rows.map(fromRow));
     } else if (req.method === 'POST') {
-        const stmt = db.prepare(`INSERT INTO items ("description", "complete")
-        VALUES (@description, 0);`);
-        const id = stmt.run(req.body).lastInsertRowid;
+        const result = await pool.query(
+            `INSERT INTO items ("description", "complete")
+        VALUES ($1, 0) RETURNING "id";`,
+            [req.body.description],
+        );
+        const id = result.rows[0].id;
         res.status(200).json({
             id,
             description: req.body.description,
