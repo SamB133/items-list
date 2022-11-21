@@ -8,7 +8,9 @@ export default async function handler(
     res: NextApiResponse<any>,
 ) {
     if (req.method === 'GET') {
-        const result = await pool.query('SELECT * FROM items');
+        const result = await pool.query(
+            'SELECT * FROM items ORDER BY "id" ASC',
+        );
         res.status(200).json(result.rows.map(fromRow));
     } else if (req.method === 'POST') {
         const result = await pool.query(
