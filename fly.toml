@@ -10,7 +10,7 @@ processes = []
     NEXT_PUBLIC_EXAMPLE = "Value goes here"
 
 [env]
-  PORT = "8080"
+  PORT = "3000"
 
 [experimental]
   allowed_public_ports = []
