@@ -1,6 +1,8 @@
 ## Items List
 
-A Next.js React Web App for keeping track of items and being able to mark them completed as you go. You also have the ability to remove all completed, or singular, items from the list.
+A Next.js React Web App for keeping track of items in a list and being able to mark them completed as you go. You also have the ability to remove all completed, or singular, items from the list.
+
+Note that anyone accessing the Web App can view and edit the items in the list.
 
 ### Access
 
