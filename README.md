@@ -1,12 +1,10 @@
 ## Items List
 
-A Next.js React Web App for keeping track of items and being able to mark them completed as you go, with the ability to remove all completed, or singular, items.
+A Next.js React Web App for keeping track of items and being able to mark them completed as you go. You also have the ability to remove all completed, or singular, items from the list.
 
-### Getting Started
+### Access
 
-After installing the dependencies with `yarn install`, run the development server with `yarn dev`.
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This Web App can be accessed and used at [https://items-list.fly.dev](https://items-list.fly.dev).
 
 ### Guidance
 
