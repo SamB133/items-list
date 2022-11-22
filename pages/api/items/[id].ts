@@ -1,16 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { fromRow } from '../../../src/item';
-import { Pool } from 'pg';
-const pool = new Pool();
+import { Client } from 'pg';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>,
 ) {
-    await pool.connect();
+    const client = new Client();
+    await client.connect();
     const { id } = req.query;
     if (req.method === 'GET') {
-        const result = await pool.query(
+        const result = await client.query(
             'SELECT * FROM items WHERE "id" = $1;',
             [id],
         );
@@ -21,7 +21,7 @@ export default async function handler(
         }
     } else if (req.method === 'PUT') {
         let temp = { ...req.body, id, complete: req.body.complete ? 1 : 0 };
-        let result = await pool.query(
+        let result = await client.query(
             `UPDATE items
         SET "description" = $1,
         "complete" = $2
@@ -38,11 +38,13 @@ export default async function handler(
             });
         }
     } else if (req.method === 'DELETE') {
-        const result = await pool.query(`DELETE FROM items WHERE "id" = $1;`, [
-            id,
-        ]);
+        const result = await client.query(
+            `DELETE FROM items WHERE "id" = $1;`,
+            [id],
+        );
         res.status(200).json({});
     } else {
         res.status(404).json({});
     }
+    client.end();
 }
